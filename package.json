@@ -1,0 +1,37 @@
+{
+  "name": "base_react_nextjs_project-20241220",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "prettier": "prettier --write \"**/*.{css,js,cjs,mjs,ts,cts,mts,jsx,tsx}\"",
+    "lint:fix": "npm-run-all prettier lint",
+    "prepare": "husky install"
+  },
+  "dependencies": {
+    "next": "15.1.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.1.2",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.11",
+    "npm-run-all": "^4.1.5",
+    "postcss": "^8",
+    "prettier": "3.4.2",
+    "prettier-plugin-sort-imports": "^1.8.6",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}
