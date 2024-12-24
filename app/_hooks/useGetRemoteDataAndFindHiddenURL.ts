@@ -1,11 +1,32 @@
 import useFetch from "./useFetch";
 import { useEffect, useState } from "react";
 
-function isPatternMatch(node: Element): RegExpMatchArray | null {
-  console.log("node:", node);
-  const htmlString = node.outerHTML;
-  console.log(htmlString);
+function isJSON(data: JSON | string): boolean {
+  if (typeof data === "string") {
+    try {
+      JSON.parse(data);
+      return true;
+    } catch {
+      return false;
+    }
+  } else {
+    return true;
+  }
+}
 
+/**
+ * Checks to see if specified HTML element node matches the pattern.
+ * @param node HTML element node to check
+ * @returns RegExpMatchArray if match, otherwise null
+ */
+function isPatternMatch(node: Element): RegExpMatchArray | null {
+  const htmlString = node.outerHTML;
+
+  // Regular expression to match pattern
+  // <code> with data-class="23...." at top
+  // <div> with data-tag="...93" as a child
+  // <span> with data-id="...21..." as child under it
+  // <i> with "char" as one of class
   const pattern = new RegExp(
     `<code .*data-class="23.*".*>` +
       `.*` +
@@ -13,9 +34,9 @@ function isPatternMatch(node: Element): RegExpMatchArray | null {
       `.*` +
       `<span .*data-id=".*21.*".*>` +
       `.*` +
-      `(<i .*class=".*\s*char\s*.*">)` +
+      `(<i .*class=".*\s*char\s*.*">` +
       `.*` +
-      `</i>` +
+      `</i>)` +
       `.*` +
       `</span>` +
       `.*` +
@@ -27,7 +48,12 @@ function isPatternMatch(node: Element): RegExpMatchArray | null {
 
   return htmlString.match(pattern);
 }
-
+/**
+ * Parse HTML then find child node inside body that matchces pattern specified
+ * in isPatternMatch function.
+ * @param htmlText HTML document in string
+ * @returns Array of RegExpMatchArray's
+ */
 function parseHTML(htmlText: string): Array<RegExpMatchArray> {
   const parser = new DOMParser();
 
@@ -44,6 +70,14 @@ function parseHTML(htmlText: string): Array<RegExpMatchArray> {
   return matchedChars;
 }
 
+function getValue(htmlElement: string): string | null {
+  const parser = new DOMParser();
+  const document = parser.parseFromString(htmlElement, "text/html");
+  const element = document.body.firstChild as HTMLElement;
+
+  return element.getAttribute("value");
+}
+
 export default function useGetRemoteDataAndFindHiddenURL() {
   const {
     fetch,
@@ -54,24 +88,41 @@ export default function useGetRemoteDataAndFindHiddenURL() {
     url: "https://tns4lpgmziiypnxxzel5ss5nyu0nftol.lambda-url.us-east-1.on.aws/challenge",
   });
 
-  const [data, setData] = useState<JSON | string>();
+  const [htmldata, setHTMLData] = useState<string>();
+  const [hiddenURL, setHiddenURL] = useState<string>();
 
   useEffect(() => {
     if (fetchData) {
       if (fetchData instanceof Blob) {
         (async () => {
           const fetchDataText = await fetchData.text();
-
-          setData(fetchDataText);
-
-          const match = parseHTML(fetchDataText);
-          console.log(match);
+          setHTMLData(fetchDataText);
         })();
+      } else if (isJSON(fetchData)) {
+        setHTMLData(JSON.stringify(fetchData));
       } else {
-        setData(fetchData);
+        setHTMLData(fetchData as string);
       }
     }
-  }, [fetchData, setData]);
+  }, [fetchData, setHTMLData]);
 
-  return { fetch, data, fetchStatus };
+  useEffect(() => {
+    if (htmldata) {
+      const matchedChars = parseHTML(htmldata);
+
+      if (matchedChars) {
+        let hiddenURL = "";
+
+        matchedChars.forEach((match) => {
+          if (match.length > 1) {
+            hiddenURL += getValue(match[1]) || "";
+          }
+        });
+
+        setHiddenURL(hiddenURL);
+      }
+    }
+  }, [htmldata, setHiddenURL]);
+
+  return { fetch, fetchStatus, hiddenURL };
 }
