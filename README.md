@@ -1,5 +1,5 @@
-# base_react_nextjs_project-20241220
-Sample basic React Next.js project setup with some dev dependencies
+# find_hidden_url_and_render_the_flag
+See notes/instructions.md for more info
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
