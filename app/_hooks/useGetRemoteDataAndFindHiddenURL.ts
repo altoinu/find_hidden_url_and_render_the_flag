@@ -104,7 +104,7 @@ export default function useGetRemoteDataAndFindHiddenURL() {
         setHTMLData(fetchData as string);
       }
     }
-  }, [fetchData, setHTMLData]);
+  }, [fetchData]);
 
   useEffect(() => {
     if (htmldata) {
@@ -122,7 +122,7 @@ export default function useGetRemoteDataAndFindHiddenURL() {
         setHiddenURL(hiddenURL);
       }
     }
-  }, [htmldata, setHiddenURL]);
+  }, [htmldata]);
 
   return { fetch, fetchStatus, hiddenURL };
 }
